@@ -92,13 +92,13 @@ contract NftMarket is Owned {
         transferFee      = _transferFee;
     }
 
-    function NewNft(address player, string memory _tokenURI, uint256 _royalty) external returns (uint256) {
+    function NewNft(string memory _tokenURI, uint256 _royalty) external returns (uint256) {
         require(_royalty < 30, "Excessive copyright fees");
         
         ERC20Like(abcToken).transferFrom(msg.sender, address(this), mintFee);
         ERC20Like(abcToken).transfer(revenueRecipient, mintFee);
         
-        uint256 tokenID = ERC721Like(nftAsset).awardItem(player, _tokenURI);
+        uint256 tokenID = ERC721Like(nftAsset).awardItem(msg.sender, _tokenURI);
 
         royalty[tokenID] = Royalty(msg.sender, _royalty, false);
 
