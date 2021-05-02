@@ -41,9 +41,10 @@ contract Owned {
 contract NftMarket is Owned {
     address public nftAsset;
     address public abcToken;
-    string  public constant version  = "1.2.1";
+    string  public constant version  = "1.2.2";
     address public revenueRecipient;
     uint256 public mintFee;
+    uint256 public sellFee;
     uint256 public transferFee;
 
     struct Offer {
@@ -83,12 +84,13 @@ contract NftMarket is Owned {
     event Withdraw(address indexed who, uint256 value);
     event AuctionPass(uint256 indexed tokenID);
 
-    constructor(address _nftAsset, address _abcToken, address _revenueRecipient, uint256 _mintFee, uint256 _transferFee) {
+    constructor(address _nftAsset, address _abcToken, address _revenueRecipient, uint256 _mintFee, uint256 _sellFee, uint256 _transferFee) {
         require(_transferFee < 20, "Excessive transaction fees");
         nftAsset         = _nftAsset;
         abcToken         = _abcToken;
         revenueRecipient = _revenueRecipient;
         mintFee          = _mintFee;
+        sellFee          = _sellFee;
         transferFee      = _transferFee;
     }
 
@@ -124,6 +126,10 @@ contract NftMarket is Owned {
         require(endTime <= block.timestamp + 30 days);
         require(endTime > block.timestamp + 5 minutes);
         require(reward < 100 - transferFee - royalty[tokenID].royalty, "Excessive reward");
+
+        ERC20Like(abcToken).transferFrom(msg.sender, address(this), sellFee);
+        ERC20Like(abcToken).transfer(revenueRecipient, sellFee);
+
         ERC721Like(nftAsset).transferFrom(msg.sender, address(this), tokenID);
         nftOfferedForSale[tokenID] = Offer(true, tokenID, msg.sender, isBid, minSalePrice, endTime, paymentToken, reward);
         emit Offered(tokenID, minSalePrice, paymentToken);
