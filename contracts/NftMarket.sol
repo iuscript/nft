@@ -41,7 +41,7 @@ contract Owned {
 contract NftMarket is Owned {
     address public nftAsset;
     address public abcToken;
-    string  public constant version  = "1.2.2";
+    string  public constant version  = "1.2.3";
     address public revenueRecipient;
     uint256 public mintFee;
     uint256 public sellFee;
@@ -223,7 +223,10 @@ contract NftMarket is Owned {
             uint256 share1 = bid.value * transferFee / 100; // 平台分润
             uint256 share2 = offer.minValue * royalty[tokenID].royalty / 100; // 艺术家分润
             uint256 share3 = 0; // 拍卖参与者分润
-            uint256 tempC = bid.value * offer.reward / 100 / bidders[tokenID].length -1;
+            uint256 tempC = 0;
+            if (bidders[tokenID].length > 1) {
+                tempC = bid.value * offer.reward / 100 / (bidders[tokenID].length -1);
+            }
 
             if (offer.paymentToken != address(0)) {
                 for (uint256 i=0; i < bidders[tokenID].length - 1; i++) {
