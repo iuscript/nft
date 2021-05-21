@@ -53,7 +53,7 @@ contract Owned {
 contract NftMarket is Owned {
     address public nftAsset;
     address public abcToken;
-    string public constant version = "2.0.3";
+    string public constant version = "2.0.4";
     address public revenueRecipient;
     uint256 public constant mintFee = 10 * 1e8;
     uint256 public constant transferFee = 5;
